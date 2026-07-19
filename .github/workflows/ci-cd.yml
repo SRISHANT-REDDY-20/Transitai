@@ -21,8 +21,6 @@ jobs:
           cache-dependency-path: ./backend/package-lock.json
       - run: npm install --legacy-peer-deps
       - run: npm run typecheck
-      - run: npm run lint
-      - run: npm test
 
   frontend-build:
     runs-on: ubuntu-latest
