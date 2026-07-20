@@ -13,70 +13,38 @@ export default function Login() {
   const { setAuth } = useAuthStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  e.preventDefault();
 
-    console.log('==============================')
-    console.log('Form submitted')
-    console.log('Email:', email)
-    console.log('API Base URL:', api.defaults.baseURL)
-    console.log('==============================')
+  console.log("========== LOGIN CLICKED ==========");
+  alert("Login function executed");
 
-    setLoading(true)
+  setLoading(true);
 
-    try {
-      console.log('Calling /auth/login...')
+  try {
+    console.log("Calling API...");
 
-      const response = await api.post('/auth/login', {
-        email,
-        password,
-        deviceId: 'web-browser',
-      })
+    const response = await api.post("/auth/login", {
+      email,
+      password,
+      deviceId: "web-browser",
+    });
 
-      console.log('API Response:', response)
+    console.log("API SUCCESS", response);
 
-      const { user, tokens } = response.data.data
+    const { user, tokens } = response.data.data;
 
-      console.log('User:', user)
-      console.log('Access Token:', tokens.accessToken)
+    setAuth(user, tokens.accessToken);
 
-      setAuth(user, tokens.accessToken)
+    localStorage.setItem("college-id", user.collegeId);
 
-      if (user.collegeId) {
-        localStorage.setItem('college-id', user.collegeId)
-      }
-
-      toast.success('Welcome back!')
-
-      console.log('Login successful!')
-    } catch (error: any) {
-      console.error('==============================')
-      console.error('LOGIN FAILED')
-      console.error(error)
-
-      if (error.response) {
-        console.error('Status:', error.response.status)
-        console.error('Data:', error.response.data)
-        console.error('Headers:', error.response.headers)
-      } else if (error.request) {
-        console.error('No response received')
-        console.error(error.request)
-      } else {
-        console.error('Request setup error')
-        console.error(error.message)
-      }
-
-      console.error('==============================')
-
-      toast.error(
-        error.response?.data?.error?.message ||
-        error.message ||
-        'Login failed'
-      )
-    } finally {
-      setLoading(false)
-      console.log('Loading finished')
-    }
+    toast.success("Welcome back!");
+  } catch (err) {
+    console.error("API ERROR", err);
+    toast.error("Login failed");
+  } finally {
+    setLoading(false);
   }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900">
