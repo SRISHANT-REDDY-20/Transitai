@@ -9,27 +9,72 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+
   const { setAuth } = useAuthStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    console.log('==============================')
+    console.log('Form submitted')
+    console.log('Email:', email)
+    console.log('API Base URL:', api.defaults.baseURL)
+    console.log('==============================')
+
     setLoading(true)
 
     try {
+      console.log('Calling /auth/login...')
+
       const response = await api.post('/auth/login', {
         email,
         password,
         deviceId: 'web-browser',
       })
 
+      console.log('API Response:', response)
+
       const { user, tokens } = response.data.data
+
+      console.log('User:', user)
+      console.log('Access Token:', tokens.accessToken)
+
       setAuth(user, tokens.accessToken)
-      localStorage.setItem('college-id', user.collegeId)
+
+      if (user.collegeId) {
+        localStorage.setItem('college-id', user.collegeId)
+      }
+
       toast.success('Welcome back!')
+
+      console.log('Login successful!')
     } catch (error: any) {
-      toast.error(error.response?.data?.error?.message || 'Login failed')
+      console.error('==============================')
+      console.error('LOGIN FAILED')
+      console.error(error)
+
+      if (error.response) {
+        console.error('Status:', error.response.status)
+        console.error('Data:', error.response.data)
+        console.error('Headers:', error.response.headers)
+      } else if (error.request) {
+        console.error('No response received')
+        console.error(error.request)
+      } else {
+        console.error('Request setup error')
+        console.error(error.message)
+      }
+
+      console.error('==============================')
+
+      toast.error(
+        error.response?.data?.error?.message ||
+        error.message ||
+        'Login failed'
+      )
     } finally {
       setLoading(false)
+      console.log('Loading finished')
     }
   }
 
@@ -41,40 +86,58 @@ export default function Login() {
             <div className="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center mb-4">
               <Bus className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-white">TransitAI</h1>
-            <p className="text-slate-300 mt-1">Smart Transportation Management</p>
+
+            <h1 className="text-2xl font-bold text-white">
+              TransitAI
+            </h1>
+
+            <p className="text-slate-300 mt-1">
+              Smart Transportation Management
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">Email</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1">
+                Email
+              </label>
+
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                 placeholder="admin@college.edu"
                 required
+                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">Password</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1">
+                Password
+              </label>
+
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none pr-10"
                   placeholder="••••••••"
                   required
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none pr-10"
                 />
+
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -84,13 +147,20 @@ export default function Login() {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Sign In'}
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                'Sign In'
+              )}
             </button>
+
           </form>
 
           <div className="mt-6 text-center text-sm text-slate-400">
             <p>Demo credentials:</p>
-            <p className="font-mono mt-1">admin@college.edu / password123</p>
+            <p className="font-mono mt-1">
+              admin@college.edu / password123
+            </p>
           </div>
         </div>
       </div>
