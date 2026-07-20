@@ -13,64 +13,61 @@ export default function Login() {
   const { setAuth } = useAuthStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  e.preventDefault();
 
-    console.log('========================')
-    console.log('STEP 1 - Login button clicked')
+  console.clear();
 
-    setLoading(true)
-    console.log('STEP 2 - Loading started')
+  console.log("========== LOGIN DEBUG ==========");
+  console.log("STEP 1 - Button clicked");
 
-    try {
-      console.log('STEP 3 - Preparing payload')
+  setLoading(true);
 
-      const payload = {
-        email,
-        password,
-        deviceId: 'web-browser',
-      }
+  try {
+    console.log("STEP 2 - Email:", email);
+    console.log("STEP 3 - Password Length:", password.length);
 
-      console.log('STEP 4 - Payload:', payload)
+    console.log("STEP 4 - API Base URL:");
+    console.log(api.defaults.baseURL);
 
-      console.log('STEP 5 - Calling API...')
+    console.log("STEP 5 - Sending request...");
 
-      const response = await api.post('/auth/login', payload)
+    const response = await api.post("/auth/login", {
+      email,
+      password,
+      deviceId: "web-browser",
+    });
 
-      console.log('STEP 6 - API Success')
-      console.log(response)
+    console.log("STEP 6 - SUCCESS");
+    console.log(response);
 
-      const { user, tokens } = response.data.data
+    const { user, tokens } = response.data.data;
 
-      console.log('STEP 7 - Saving auth')
+    setAuth(user, tokens.accessToken);
+    localStorage.setItem("college-id", user.collegeId);
 
-      setAuth(user, tokens.accessToken)
+    toast.success("Welcome back!");
+  } catch (err: any) {
+    console.log("STEP 7 - ERROR");
 
-      localStorage.setItem('college-id', user.collegeId)
+    console.error(err);
 
-      console.log('STEP 8 - Login Complete')
-
-      toast.success('Welcome back!')
-    } catch (err: any) {
-      console.error('STEP ERROR')
-      console.error(err)
-
-      if (err.response) {
-        console.error('Response:', err.response.data)
-        console.error('Status:', err.response.status)
-      }
-
-      if (err.request) {
-        console.error('Request:', err.request)
-      }
-
-      console.error('Message:', err.message)
-
-      toast.error(err.response?.data?.error?.message || 'Login failed')
-    } finally {
-      console.log('STEP FINALLY')
-      setLoading(false)
+    if (err.response) {
+      console.log("Status:", err.response.status);
+      console.log("Data:", err.response.data);
     }
+
+    if (err.request) {
+      console.log("Request object:", err.request);
+    }
+
+    console.log("Message:", err.message);
+
+    toast.error(err.response?.data?.error?.message || "Login failed");
+  } finally {
+    console.log("STEP 8 - Finished");
+    setLoading(false);
   }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900">
