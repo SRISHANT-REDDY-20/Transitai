@@ -15,23 +15,33 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  console.log("========== LOGIN CLICKED ==========");
+  console.log("STEP 1");
   alert("Login function executed");
 
   setLoading(true);
 
-  try {
-    console.log("Calling API...");
+  console.log("STEP 2");
 
-    const response = await api.post("/auth/login", {
+  try {
+    console.log("STEP 3");
+
+    const payload = {
       email,
       password,
       deviceId: "web-browser",
-    });
+    };
 
-    console.log("API SUCCESS", response);
+    console.log("STEP 4", payload);
+
+    console.log("STEP 5 - About to call API");
+
+    const response = await api.post("/auth/login", payload);
+
+    console.log("STEP 6 - API Success", response);
 
     const { user, tokens } = response.data.data;
+
+    console.log("STEP 7");
 
     setAuth(user, tokens.accessToken);
 
@@ -39,9 +49,10 @@ export default function Login() {
 
     toast.success("Welcome back!");
   } catch (err) {
-    console.error("API ERROR", err);
+    console.error("STEP ERROR", err);
     toast.error("Login failed");
   } finally {
+    console.log("STEP FINALLY");
     setLoading(false);
   }
 };
