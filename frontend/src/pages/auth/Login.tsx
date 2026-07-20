@@ -13,49 +13,64 @@ export default function Login() {
   const { setAuth } = useAuthStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault()
 
-  console.log("STEP 1");
-  alert("Login function executed");
+    console.log('========================')
+    console.log('STEP 1 - Login button clicked')
 
-  setLoading(true);
+    setLoading(true)
+    console.log('STEP 2 - Loading started')
 
-  console.log("STEP 2");
+    try {
+      console.log('STEP 3 - Preparing payload')
 
-  try {
-    console.log("STEP 3");
+      const payload = {
+        email,
+        password,
+        deviceId: 'web-browser',
+      }
 
-    const payload = {
-      email,
-      password,
-      deviceId: "web-browser",
-    };
+      console.log('STEP 4 - Payload:', payload)
 
-    console.log("STEP 4", payload);
+      console.log('STEP 5 - Calling API...')
 
-    console.log("STEP 5 - About to call API");
+      const response = await api.post('/auth/login', payload)
 
-    const response = await api.post("/auth/login", payload);
+      console.log('STEP 6 - API Success')
+      console.log(response)
 
-    console.log("STEP 6 - API Success", response);
+      const { user, tokens } = response.data.data
 
-    const { user, tokens } = response.data.data;
+      console.log('STEP 7 - Saving auth')
 
-    console.log("STEP 7");
+      setAuth(user, tokens.accessToken)
 
-    setAuth(user, tokens.accessToken);
+      localStorage.setItem('college-id', user.collegeId)
 
-    localStorage.setItem("college-id", user.collegeId);
+      console.log('STEP 8 - Login Complete')
 
-    toast.success("Welcome back!");
-  } catch (err) {
-    console.error("STEP ERROR", err);
-    toast.error("Login failed");
-  } finally {
-    console.log("STEP FINALLY");
-    setLoading(false);
+      toast.success('Welcome back!')
+    } catch (err: any) {
+      console.error('STEP ERROR')
+      console.error(err)
+
+      if (err.response) {
+        console.error('Response:', err.response.data)
+        console.error('Status:', err.response.status)
+      }
+
+      if (err.request) {
+        console.error('Request:', err.request)
+      }
+
+      console.error('Message:', err.message)
+
+      toast.error(err.response?.data?.error?.message || 'Login failed')
+    } finally {
+      console.log('STEP FINALLY')
+      setLoading(false)
+    }
   }
-};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900">
@@ -76,7 +91,6 @@ export default function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1">
                 Email
@@ -86,9 +100,9 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                 placeholder="admin@college.edu"
                 required
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
               />
             </div>
 
@@ -102,9 +116,9 @@ export default function Login() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none pr-10"
                   placeholder="••••••••"
                   required
-                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none pr-10"
                 />
 
                 <button
@@ -132,7 +146,6 @@ export default function Login() {
                 'Sign In'
               )}
             </button>
-
           </form>
 
           <div className="mt-6 text-center text-sm text-slate-400">
